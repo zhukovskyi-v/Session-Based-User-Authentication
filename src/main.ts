@@ -1,13 +1,12 @@
 import { NestFactory } from '@nestjs/core';
-import { Logger } from 'nestjs-pino';
 import * as session from 'express-session';
 import * as passport from 'passport';
 
 import { AppModule } from './app.module';
+import { NewrelicInterceptor } from './interceptors/logger';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { bufferLogs: true });
-  app.useLogger(app.get(Logger));
   app.use(
     session({
       secret: 'keyboard',
@@ -15,9 +14,10 @@ async function bootstrap() {
       saveUninitialized: false,
     }),
   );
+  app.useGlobalInterceptors(new NewrelicInterceptor());
   app.use(passport.initialize());
   app.use(passport.session());
 
-  await app.listen(process.env.APP_PORT as unknown as number);
+  await app.listen(Number(process.env.APP_PORT) as unknown as number);
 }
 bootstrap();

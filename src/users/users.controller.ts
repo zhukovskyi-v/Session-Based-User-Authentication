@@ -18,6 +18,7 @@ export class UsersController {
     @Body('password') userPassword: string,
     @Body('username') userName: string,
   ) {
+    console.log('im here');
     const saltOrRounds = 10;
     const hashedPassword = await bcrypt.hash(userPassword, saltOrRounds);
     const result = await this.usersService.insertUser(userName, hashedPassword);
